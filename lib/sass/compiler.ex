@@ -1,6 +1,6 @@
 defmodule Sass.Compiler do
   @moduledoc """
-    Connection to the NIF for sass
+  Connection to the NIF for sass
   """
 
   @compile {:autoload, false}

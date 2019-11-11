@@ -20,6 +20,16 @@ defmodule Sass do
   """
 
   @doc """
+    Sass option values for sass output style [nested](https://sass-lang.com/documentation/js-api#outputstyle)
+  """
+  @sass_styles [
+    expanded: 1,
+    compressed: 3,
+    nested: 0,
+    compact: 2
+  ]
+
+  @doc """
   Compiles a string of SASS into a string of CSS
 
   ## Parameters
@@ -37,8 +47,8 @@ defmodule Sass do
 
   """
 
-  def compile(string, options \\ %{output_style: sass_style_nested()}) do
-    sass = string |> String.trim()
+  def compile(source, options \\ %{output_style: @sass_styles[:nested]}) do
+    sass = source |> String.trim()
     Sass.Compiler.compile(sass, options)
   end
 
@@ -52,7 +62,6 @@ defmodule Sass do
 
   ## Examples
 
-
       Sass.compile_file("application.scss")
       #=> "a { color: #fff; }"
       # With Options
@@ -60,7 +69,7 @@ defmodule Sass do
       #=> "a{color:#fff;}"
 
   """
-  def compile_file(path, options \\ %{output_style: sass_style_nested()}) do
+  def compile_file(path, options \\ %{output_style: @sass_styles[:nested]}) do
     filename = path |> String.trim()
     Sass.Compiler.compile_file(filename, options)
   end
@@ -69,24 +78,4 @@ defmodule Sass do
     Returns current sass version
   """
   def version, do: Sass.Compiler.version()
-
-  @doc """
-    Sass option value for sass output style [nested](http://sass-lang.com/documentation/file.SASS_REFERENCE.html#_13)
-  """
-  def sass_style_nested, do: 0
-
-  @doc """
-    Sass option value for sass output style [expanded](http://sass-lang.com/documentation/file.SASS_REFERENCE.html#_14)
-  """
-  def sass_style_expanded, do: 1
-
-  @doc """
-    Sass option value for sass output style [compact](http://sass-lang.com/documentation/file.SASS_REFERENCE.html#_15)
-  """
-  def sass_style_compact, do: 2
-
-  @doc """
-    Sass option value for sass output style [compressed](http://sass-lang.com/documentation/file.SASS_REFERENCE.html#_16)
-  """
-  def sass_style_compressed, do: 3
 end

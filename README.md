@@ -3,12 +3,17 @@ LibSass Nif for elixir
 
 ## Installation
 
+Add `sass_compiler` to your list of dependencies in `mix.exs`:
+
 ```elixir
-# Add sass_compiler to your list of dependencies in mix.exs:
 def deps do
-  [{:sass_compiler, "~> 0.1.0"}]
+  [
+    {:sass_compiler, "~> 0.1.0"}
+  ]
 end
 ```
+
+## Usage
 
 ```elixir
 Sass.compile "#navbar {width: 80%;height: 23px;ul { list-style-type: none; } li {float: left; a { font-weight: bold; } } }"
