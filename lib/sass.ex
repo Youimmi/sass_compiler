@@ -46,7 +46,8 @@ defmodule Sass do
       #=> "a{color:#fff;}"
 
   """
-
+  @spec compile(String.t()) :: no_return
+  @spec compile(String.t(), map) :: no_return
   def compile(source, options \\ %{output_style: @sass_styles[:nested]}) do
     sass = source |> String.trim()
     Sass.Compiler.compile(sass, options)
@@ -69,6 +70,8 @@ defmodule Sass do
       #=> "a{color:#fff;}"
 
   """
+  @spec compile_file(String.t()) :: no_return
+  @spec compile_file(String.t(), map) :: no_return
   def compile_file(path, options \\ %{output_style: @sass_styles[:nested]}) do
     filename = path |> String.trim()
     Sass.Compiler.compile_file(filename, options)
@@ -77,5 +80,6 @@ defmodule Sass do
   @doc """
     Returns current sass version
   """
+  @spec version :: no_return
   def version, do: Sass.Compiler.version()
 end

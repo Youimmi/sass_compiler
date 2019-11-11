@@ -25,9 +25,9 @@
 
 *.o
 *.plt
+*.plt.hash
 *.so
 .*
-!.gitignore
 !.formatter.exs
-
-/priv
+!.gitignore
+!.keep
