@@ -23,10 +23,18 @@
 # If NPM crashes, it generates a log, let's ignore it too.
 *.log
 
+# Ignore package files
+sass_compiler-*
+
+# Ignore compiled C/C++ files
 *.o
+*.so
+
+# Ignore Dialyze files
 *.plt
 *.plt.hash
-*.so
+
+# Ignore hidden files
 .*
 !.formatter.exs
 !.gitignore

@@ -34,7 +34,7 @@ defmodule SassCompiler.Mixfile do
 
   defp package do
     [
-      exclude_patterns: [".DS_Store", "*.o", "libsass/lib", "libsass/.git"],
+      exclude_patterns: ["*.o", "libsass/lib", "libsass/.git"],
       files: ["c_src", "lib", "libsass", "LICENSE", "Makefile", "mix.exs", "README.md"],
       maintainers: [],
       licenses: ["MIT"],
