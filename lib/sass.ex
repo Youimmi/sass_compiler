@@ -19,9 +19,7 @@ defmodule Sass do
 
   """
 
-  @doc """
-    Sass option values for sass output style [nested](https://sass-lang.com/documentation/js-api#outputstyle)
-  """
+  # Sass option values for sass output style [nested](https://sass-lang.com/documentation/js-api#outputstyle)
   @sass_styles [
     expanded: 1,
     compressed: 3,
