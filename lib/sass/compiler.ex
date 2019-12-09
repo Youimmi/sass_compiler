@@ -37,7 +37,7 @@ defmodule Sass.Compiler do
   @doc """
     A noop that gets overwritten by the NIF compile_file
   """
-  def version() do
+  def version do
     exit(:nif_library_not_loaded)
   end
 

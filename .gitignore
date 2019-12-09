@@ -23,7 +23,7 @@
 # If NPM crashes, it generates a log, let's ignore it too.
 *.log
 
-# Ignore package files
+# Ignore package tarball (built via "mix hex.build").
 sass_compiler-*
 
 # Ignore compiled C/C++ files
