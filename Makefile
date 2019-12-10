@@ -44,6 +44,6 @@ $(LIB_NAME): c_src/sass_nif.o
 	$(CC) $^ $(ERL_LDFLAGS) $(LDFLAGS) -Bstatic -lsass -lm -lc -o $@
 
 sass_compiler-clean:
-	rm -rf _build priv && rm -f c_src/*.o
+	rm -rf _build libsass/lib priv/sass_nif.so && rm -f c_src/*.o
 
 .PHONY: all clean
