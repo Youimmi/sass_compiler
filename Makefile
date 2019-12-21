@@ -26,6 +26,22 @@ ifeq ($(CROSSCOMPILE),)
 	endif
 endif
 
+NPROCS := 1
+OS := $(shell uname)
+export NPROCS
+
+ifeq ($J,)
+
+ifeq ($(OS),Linux)
+  NPROCS := $(shell grep -c ^processor /proc/cpuinfo)
+else ifeq ($(OS),Darwin)
+  NPROCS := $(shell nproc)
+endif # $(OS)
+
+else
+  NPROCS := $J
+endif # $J
+
 all: libsass-make $(LIB_NAME)
 
 clean: libsass-clean sass_compiler-clean
@@ -34,7 +50,7 @@ libsass-clean:
 	$(MAKE) -C $(SASS_DIR) clean
 
 libsass-make:
-	$(MAKE) -C $(SASS_DIR)
+	$(MAKE) -C $(SASS_DIR) -j$(NPROCS)
 
 %.o: %.c
 	$(CC) -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
