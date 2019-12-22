@@ -30,10 +30,6 @@ sass_compiler-*
 *.o
 *.so
 
-# Ignore Dialyze files
-*.plt
-*.plt.hash
-
 # Ignore hidden files
 .*
 !.formatter.exs
