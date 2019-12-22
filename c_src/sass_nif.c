@@ -5,49 +5,50 @@
 #include <stdio.h>
 #include "erl_nif.h"
 
-static inline ERL_NIF_TERM make_atom(ErlNifEnv* env, const char* name)
+static inline ERL_NIF_TERM make_atom(ErlNifEnv *env, const char *name)
 {
   ERL_NIF_TERM ret;
-  if(enif_make_existing_atom(env, name, &ret, ERL_NIF_LATIN1)) {
+  if (enif_make_existing_atom(env, name, &ret, ERL_NIF_LATIN1))
+  {
     return ret;
   }
   return enif_make_atom(env, name);
 }
 // create tuple used to return compiled sass results
-static inline ERL_NIF_TERM make_tuple(ErlNifEnv* env, const char* mesg, const char* atom_string)
+static inline ERL_NIF_TERM make_tuple(ErlNifEnv *env, const char *mesg, const char *atom_string)
 {
   int output_len = sizeof(char) * strlen(mesg);
   ErlNifBinary output_binary;
   enif_alloc_binary(output_len, &output_binary);
-  strncpy((char*)output_binary.data, mesg, output_len);
+  strncpy((char *)output_binary.data, mesg, output_len);
   ERL_NIF_TERM atom = make_atom(env, atom_string);
   ERL_NIF_TERM str = enif_make_binary(env, &output_binary);
   return enif_make_tuple2(env, atom, str);
 }
 // Size of elixir charlist string
-static int my_enif_list_size(ErlNifEnv* env, ERL_NIF_TERM list)
+static int my_enif_list_size(ErlNifEnv *env, ERL_NIF_TERM list)
 {
   ERL_NIF_TERM head, tail, nexttail;
   int size = 0;
   tail = list;
-  while(enif_get_list_cell(env, tail, &head, &nexttail))
+  while (enif_get_list_cell(env, tail, &head, &nexttail))
   {
     tail = nexttail;
-    size = size+1;
+    size = size + 1;
   }
   return size;
 }
 // converts a Elixir charlist into a c string
-static char* my_enif_get_string(ErlNifEnv *env, ERL_NIF_TERM list)
+static char *my_enif_get_string(ErlNifEnv *env, ERL_NIF_TERM list)
 {
   char *buf;
-  int size=my_enif_list_size(env, list);
+  int size = my_enif_list_size(env, list);
 
-  if (!(buf = (char*) enif_alloc(size+1)))
+  if (!(buf = (char *)enif_alloc(size + 1)))
   {
     return NULL;
   }
-  if (enif_get_string(env, list, buf, size+1, ERL_NIF_LATIN1)<1)
+  if (enif_get_string(env, list, buf, size + 1, ERL_NIF_LATIN1) < 1)
   {
     enif_free(buf);
     return NULL;
@@ -56,31 +57,33 @@ static char* my_enif_get_string(ErlNifEnv *env, ERL_NIF_TERM list)
 }
 
 // Get atom name as a string.
-char* get_atom_string(ErlNifEnv *env, ERL_NIF_TERM atom) {
-        unsigned atom_size = 0;
-        char *string = NULL;
-        enif_get_atom_length(env, atom, &atom_size, ERL_NIF_LATIN1);
-        string = (char*)enif_alloc(sizeof(char) * (atom_size + 1));
-        if(!enif_get_atom(env, atom, string, (atom_size + 1), ERL_NIF_LATIN1)) {
-            enif_free(string);
-        }
+char *get_atom_string(ErlNifEnv *env, ERL_NIF_TERM atom)
+{
+  unsigned atom_size = 0;
+  char *string = NULL;
+  enif_get_atom_length(env, atom, &atom_size, ERL_NIF_LATIN1);
+  string = (char *)enif_alloc(sizeof(char) * (atom_size + 1));
+  if (!enif_get_atom(env, atom, string, (atom_size + 1), ERL_NIF_LATIN1))
+  {
+    enif_free(string);
+  }
 
-        return string;
+  return string;
 }
 
 // Get a boolean true or false from there atom representations
-bool get_bool_from_atom(ErlNifEnv *env, ERL_NIF_TERM atom) {
+bool get_bool_from_atom(ErlNifEnv *env, ERL_NIF_TERM atom)
+{
 
-        char *_bool = get_atom_string(env, atom);
-        if (strcmp(_bool, "true") == 0) {
-            enif_free(_bool);
-            return true;
-        }
-        enif_free(_bool);
-        return false;
+  char *_bool = get_atom_string(env, atom);
+  if (strcmp(_bool, "true") == 0)
+  {
+    enif_free(_bool);
+    return true;
+  }
+  enif_free(_bool);
+  return false;
 }
-
-
 
 // Sass Options
 /*void sass_option_set_input_path (struct Sass_Options* options, const char* input_path);*/
@@ -112,138 +115,168 @@ bool get_bool_from_atom(ErlNifEnv *env, ERL_NIF_TERM atom) {
 #define SASS_LINEFEED_WINDOWS "windows"
 #define SASS_LINEFEED_UNIX "unix"
 
-
 // This function parses and sets sass optiosn on the sass contenxt
 // Note not all options are implimented at this time see the constant definitions above
-struct Sass_Options* parse_sass_options(ErlNifEnv *env, Sass_Context *context, ERL_NIF_TERM map) {
-    ERL_NIF_TERM key, value;
+struct Sass_Options *parse_sass_options(ErlNifEnv *env, Sass_Context *context, ERL_NIF_TERM map)
+{
+  ERL_NIF_TERM key, value;
 
-    struct Sass_Options* options = sass_context_get_options(context);
+  struct Sass_Options *options = sass_context_get_options(context);
 
-    if(!enif_is_map(env, map)) {
-        ERL_NIF_TERM exception = enif_make_string(env, "(Argument Error) 2nd argumanet must be a map", ERL_NIF_LATIN1);
-        enif_raise_exception(env, exception);
+  if (!enif_is_map(env, map))
+  {
+    ERL_NIF_TERM exception = enif_make_string(env, "(Argument Error) 2nd argumanet must be a map", ERL_NIF_LATIN1);
+    enif_raise_exception(env, exception);
+  }
+  // output style
+  key = make_atom(env, SASS_OUTPUT_STYLE);
+  if (enif_get_map_value(env, map, key, &value))
+  {
+    int output_style;
+    enif_get_int(env, value, &output_style);
+    sass_option_set_output_style(options, (Sass_Output_Style)output_style);
+  }
+  // precision
+  key = make_atom(env, SASS_PRECISION);
+  if (enif_get_map_value(env, map, key, &value))
+  {
+    int precision;
+    enif_get_int(env, value, &precision);
+    sass_option_set_precision(options, precision);
+  }
+  // source comments
+  key = make_atom(env, SASS_SOURCE_COMMENTS);
+  if (enif_get_map_value(env, map, key, &value))
+  {
+    sass_option_set_source_comments(options, get_bool_from_atom(env, value));
+  }
+  // source map embed
+  key = make_atom(env, SASS_SOURCE_MAP_EMBED);
+  if (enif_get_map_value(env, map, key, &value))
+  {
+    sass_option_set_source_map_embed(options, get_bool_from_atom(env, value));
+  }
+  // source map contents
+  key = make_atom(env, SASS_SOURCE_MAP_CONTENTS);
+  if (enif_get_map_value(env, map, key, &value))
+  {
+    sass_option_set_source_map_contents(options, get_bool_from_atom(env, value));
+  }
+  // omit source map url
+  key = make_atom(env, SASS_OMIT_SOURCE_MAP_URL);
+  if (enif_get_map_value(env, map, key, &value))
+  {
+    sass_option_set_omit_source_map_url(options, get_bool_from_atom(env, value));
+  }
+  // is indented syntax
+  key = make_atom(env, SASS_IS_INDENTED_SYNTAX);
+  if (enif_get_map_value(env, map, key, &value))
+  {
+    sass_option_set_is_indented_syntax_src(options, get_bool_from_atom(env, value));
+  }
+  // indent
+  key = make_atom(env, SASS_INDENT);
+  if (enif_get_map_value(env, map, key, &value))
+  {
+    if (strcmp(get_atom_string(env, value), SASS_INDENT_TAB_ATOM) == 0)
+    {
+      sass_option_set_linefeed(options, SASS_INDENT_TAB);
     }
-    // output style
-    key = make_atom(env, SASS_OUTPUT_STYLE);
-    if (enif_get_map_value(env, map, key, &value)) {
-        int output_style;
-        enif_get_int(env, value, &output_style);
-        sass_option_set_output_style(options, (Sass_Output_Style)output_style);
+    else
+    {
+      sass_option_set_linefeed(options, SASS_INDENT_SPACE);
     }
-    // precision
-    key = make_atom(env, SASS_PRECISION);
-    if (enif_get_map_value(env, map, key, &value)) {
-        int precision;
-        enif_get_int(env, value, &precision);
-        sass_option_set_precision(options, precision);
+  }
+  // linefeed
+  key = make_atom(env, SASS_LINEFEED);
+  if (enif_get_map_value(env, map, key, &value))
+  {
+    char *val = get_atom_string(env, value);
+    if (strcmp(val, SASS_LINEFEED_WINDOWS) == 0)
+    {
+      sass_option_set_indent(options, SASS_WINDOWS_LINEFEED);
     }
-    // source comments
-    key = make_atom(env, SASS_SOURCE_COMMENTS);
-    if (enif_get_map_value(env, map, key, &value)) {
-        sass_option_set_source_comments(options, get_bool_from_atom(env, value));
+    else if (strcmp(val, SASS_LINEFEED_UNIX))
+    {
+      sass_option_set_indent(options, SASS_UNIX_LINEFEED);
     }
-    // source map embed
-    key = make_atom(env, SASS_SOURCE_MAP_EMBED);
-    if (enif_get_map_value(env, map, key, &value)) {
-        sass_option_set_source_map_embed(options, get_bool_from_atom(env, value));
+    else
+    {
+      ERL_NIF_TERM exception = enif_make_string(env, "(Argument Error) linefeed must be ':unix' or ':windows'", ERL_NIF_LATIN1);
+      enif_raise_exception(env, exception);
     }
-    // source map contents
-    key = make_atom(env, SASS_SOURCE_MAP_CONTENTS);
-    if (enif_get_map_value(env, map, key, &value)) {
-        sass_option_set_source_map_contents(options, get_bool_from_atom(env, value));
+  }
+  // include paths
+  key = make_atom(env, SASS_INCLUDE_PATHS);
+  if (enif_get_map_value(env, map, key, &value))
+  {
+    ERL_NIF_TERM head;
+    if (!enif_is_list(env, value))
+    {
+      ERL_NIF_TERM exception = enif_make_string(env, "(Argument Error) include_paths must be a list", ERL_NIF_LATIN1);
+      enif_raise_exception(env, exception);
     }
-    // omit source map url
-    key = make_atom(env, SASS_OMIT_SOURCE_MAP_URL);
-    if (enif_get_map_value(env, map, key, &value)) {
-        sass_option_set_omit_source_map_url(options, get_bool_from_atom(env, value));
-    }
-    // is indented syntax
-    key = make_atom(env, SASS_IS_INDENTED_SYNTAX);
-    if (enif_get_map_value(env, map, key, &value)) {
-        sass_option_set_is_indented_syntax_src(options, get_bool_from_atom(env, value));
-    }
-    // indent
-    key = make_atom(env, SASS_INDENT);
-    if (enif_get_map_value(env, map, key, &value)) {
-        if (strcmp(get_atom_string(env, value), SASS_INDENT_TAB_ATOM) == 0) {
-            sass_option_set_linefeed(options, SASS_INDENT_TAB);
-        } else {
-            sass_option_set_linefeed(options, SASS_INDENT_SPACE);
-        }
-    }
-    // linefeed
-    key = make_atom(env, SASS_LINEFEED);
-    if (enif_get_map_value(env, map, key, &value)) {
-        char *val = get_atom_string(env, value);
-        if (strcmp(val, SASS_LINEFEED_WINDOWS) == 0) {
-            sass_option_set_indent(options, SASS_WINDOWS_LINEFEED);
-        } else if (strcmp(val, SASS_LINEFEED_UNIX)){
-            sass_option_set_indent(options, SASS_UNIX_LINEFEED);
-        } else {
-            ERL_NIF_TERM exception = enif_make_string(env, "(Argument Error) linefeed must be ':unix' or ':windows'", ERL_NIF_LATIN1);
-            enif_raise_exception(env, exception);
-        }
-    }
-    // include paths
-    key = make_atom(env, SASS_INCLUDE_PATHS);
-    if (enif_get_map_value(env, map, key, &value)) {
-        ERL_NIF_TERM head;
-        if (!enif_is_list(env, value)) {
-            ERL_NIF_TERM exception = enif_make_string(env, "(Argument Error) include_paths must be a list", ERL_NIF_LATIN1);
-            enif_raise_exception(env, exception);
-        }
-        while(!enif_is_empty_list(env, value)) {
-            char *path;
-            enif_get_list_cell(env, value, &head, &value);
-            if (enif_is_binary(env, head)) {
-                ErlNifBinary bin;
-                enif_inspect_binary(env, head, &bin);
-                path = (char*)enif_alloc(strlen((const char*)bin.data) + 1);
-                strcpy(path, (const char *)bin.data);
-                path[bin.size] = '\0';
-                sass_option_push_include_path(options, path);
-                enif_free(path);
-            } else if(enif_is_list(env, head)) {
-                path = my_enif_get_string(env, head);
-                sass_option_push_include_path(options, path);
-                enif_free(path);
-            }
-        };
-    }
+    while (!enif_is_empty_list(env, value))
+    {
+      char *path;
+      enif_get_list_cell(env, value, &head, &value);
+      if (enif_is_binary(env, head))
+      {
+        ErlNifBinary bin;
+        enif_inspect_binary(env, head, &bin);
+        path = (char *)enif_alloc(strlen((const char *)bin.data) + 1);
+        strcpy(path, (const char *)bin.data);
+        path[bin.size] = '\0';
+        sass_option_push_include_path(options, path);
+        enif_free(path);
+      }
+      else if (enif_is_list(env, head))
+      {
+        path = my_enif_get_string(env, head);
+        sass_option_push_include_path(options, path);
+        enif_free(path);
+      }
+    };
+  }
 
-    return options;
+  return options;
 }
 
 // NIF for compiling a sass string arguments are
 // * string sass_string
 // * Map sass_options
-static ERL_NIF_TERM sass_compile_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+static ERL_NIF_TERM sass_compile_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
   ERL_NIF_TERM ret;
 
-  if (argc > 2) {
+  if (argc > 2)
+  {
     return enif_make_badarg(env);
   }
 
   char *sass_string;
 
-  if(enif_is_binary(env, argv[0])) {
-      ErlNifBinary bin;
-      enif_inspect_binary(env, argv[0], &bin);
-      sass_string = (char*)malloc(strlen((const char*)bin.data) + 1);
-      strcpy(sass_string, (const char *)bin.data);
-      sass_string[bin.size] = '\0';
-  } else if(enif_is_list(env, argv[0])) {
-      sass_string = (char*)malloc(my_enif_list_size(env, argv[0]));
-      strcpy(sass_string, my_enif_get_string(env, argv[0]));
-  } else {
-      return enif_make_badarg(env);
+  if (enif_is_binary(env, argv[0]))
+  {
+    ErlNifBinary bin;
+    enif_inspect_binary(env, argv[0], &bin);
+    sass_string = (char *)malloc(strlen((const char *)bin.data) + 1);
+    strcpy(sass_string, (const char *)bin.data);
+    sass_string[bin.size] = '\0';
+  }
+  else if (enif_is_list(env, argv[0]))
+  {
+    sass_string = (char *)malloc(my_enif_list_size(env, argv[0]));
+    strcpy(sass_string, my_enif_get_string(env, argv[0]));
+  }
+  else
+  {
+    return enif_make_badarg(env);
   }
 
-  struct Sass_Data_Context* ctx = sass_make_data_context(sass_string);
-  struct Sass_Context* ctx_out = sass_data_context_get_context(ctx);
-  struct Sass_Options* options = parse_sass_options(env, ctx_out, argv[1]);
+  struct Sass_Data_Context *ctx = sass_make_data_context(sass_string);
+  struct Sass_Context *ctx_out = sass_data_context_get_context(ctx);
+  struct Sass_Options *options = parse_sass_options(env, ctx_out, argv[1]);
 
   sass_data_context_set_options(ctx, options);
 
@@ -253,15 +286,23 @@ static ERL_NIF_TERM sass_compile_nif(ErlNifEnv* env, int argc, const ERL_NIF_TER
   const char *error_message = sass_context_get_error_message(ctx_out);
   const char *output_string = sass_context_take_output_string(ctx_out);
 
-  if (error_status) {
-    if (error_message) {
+  if (error_status)
+  {
+    if (error_message)
+    {
       ret = make_tuple(env, error_message, "error");
-    } else {
+    }
+    else
+    {
       ret = make_tuple(env, "An error occured; no error message available.", "error");
     }
-  } else if (output_string) {
+  }
+  else if (output_string)
+  {
     ret = make_tuple(env, output_string, "ok");
-  } else {
+  }
+  else
+  {
     ret = make_tuple(env, "Unknown internal error.", "error");
   }
   // this will also free sass_string
@@ -272,33 +313,38 @@ static ERL_NIF_TERM sass_compile_nif(ErlNifEnv* env, int argc, const ERL_NIF_TER
 // NIF for compiling a sass file arguments are
 // * string filename
 // * Map sass_options
-static ERL_NIF_TERM sass_compile_file_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+static ERL_NIF_TERM sass_compile_file_nif(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
 {
   ERL_NIF_TERM ret;
-  if (argc > 2) {
+  if (argc > 2)
+  {
     return enif_make_badarg(env);
   }
 
   char *sass_file;
 
-  if(enif_is_binary(env, argv[0])) {
+  if (enif_is_binary(env, argv[0]))
+  {
     ErlNifBinary bin;
     enif_inspect_binary(env, argv[0], &bin);
-    sass_file = (char*)malloc(strlen((const char*)bin.data) + 1);
+    sass_file = (char *)malloc(strlen((const char *)bin.data) + 1);
     strcpy(sass_file, (const char *)bin.data);
     sass_file[bin.size] = '\0';
-  } else if(enif_is_list(env, argv[0])) {
-    sass_file = (char*)malloc(my_enif_list_size(env, argv[0]));
+  }
+  else if (enif_is_list(env, argv[0]))
+  {
+    sass_file = (char *)malloc(my_enif_list_size(env, argv[0]));
     strcpy(sass_file, my_enif_get_string(env, argv[0]));
-  } else {
+  }
+  else
+  {
     return enif_make_badarg(env);
   }
 
   // create the file context and get all related structs
-  struct Sass_File_Context* file_ctx = sass_make_file_context(sass_file);
-  struct Sass_Context* ctx = sass_file_context_get_context(file_ctx);
-  struct Sass_Options* options = parse_sass_options(env, ctx, argv[1]);
-
+  struct Sass_File_Context *file_ctx = sass_make_file_context(sass_file);
+  struct Sass_Context *ctx = sass_file_context_get_context(file_ctx);
+  struct Sass_Options *options = parse_sass_options(env, ctx, argv[1]);
 
   sass_file_context_set_options(file_ctx, options);
 
@@ -307,15 +353,23 @@ static ERL_NIF_TERM sass_compile_file_nif(ErlNifEnv* env, int argc, const ERL_NI
   const char *error_message = sass_context_get_error_message(ctx);
   const char *output_string = sass_context_get_output_string(ctx);
 
-  if (error_status) {
-    if (error_message) {
+  if (error_status)
+  {
+    if (error_message)
+    {
       ret = make_tuple(env, error_message, "error");
-    } else {
+    }
+    else
+    {
       ret = make_tuple(env, "An error occured; no error message available.", "error");
     }
-  } else if (output_string) {
+  }
+  else if (output_string)
+  {
     ret = make_tuple(env, output_string, "ok");
-  } else {
+  }
+  else
+  {
     ret = make_tuple(env, "Unknown internal error.", "error");
   }
   //this will also free sass_file
@@ -324,21 +378,22 @@ static ERL_NIF_TERM sass_compile_file_nif(ErlNifEnv* env, int argc, const ERL_NI
   return ret;
 }
 
-static ERL_NIF_TERM sass_version(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
+static ERL_NIF_TERM sass_version(ErlNifEnv *env, int argc, const ERL_NIF_TERM argv[])
+{
+  (void)argc;
+  (void)argv;
   const char *version = libsass_version();
   int output_len = sizeof(char) * strlen(version);
   ErlNifBinary output_binary;
   enif_alloc_binary(output_len, &output_binary);
-  strncpy((char*)output_binary.data, version, output_len);
+  strncpy((char *)output_binary.data, version, output_len);
   ERL_NIF_TERM str = enif_make_binary(env, &output_binary);
   return str;
-
 }
 
 static ErlNifFunc nif_funcs[] = {
-  { "compile", 2, sass_compile_nif, 0 },
-  { "compile_file", 2, sass_compile_file_nif, 0 },
-  { "version", 0, sass_version, 0 }
-};
+    {"compile", 2, sass_compile_nif, 0},
+    {"compile_file", 2, sass_compile_file_nif, 0},
+    {"version", 0, sass_version, 0}};
 
 ERL_NIF_INIT(Elixir.Sass.Compiler, nif_funcs, NULL, NULL, NULL, NULL);

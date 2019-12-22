@@ -13,11 +13,11 @@ SASS_DIR = libsass
 LIB_NAME = priv/sass_nif.so
 
 # Set Erlang-specific compile and linker flags
-ERL_CFLAGS ?= -I$(ERL_EI_INCLUDE_DIR) -Llibsass/lib -lsass -Ilibsass -Ilibsass/include
+ERL_CFLAGS ?= -I$(ERL_EI_INCLUDE_DIR) -Ilibsass -Ilibsass/include
 ERL_LDFLAGS ?= -Ilibsass -Ilibsass/include -Llibsass/lib
 
 LDFLAGS += -fPIC -shared
-CFLAGS ?= -fPIC -O3 -Wall -Wextra -Wno-unused-parameter
+CFLAGS ?= -fPIC -O3 -Wall -Wextra
 CC = $(CROSSCOMPILER)g++
 
 ifeq ($(CROSSCOMPILE),)
@@ -53,7 +53,7 @@ libsass-make:
 	$(MAKE) -C $(SASS_DIR) -j$(NPROCS)
 
 %.o: %.c
-	$(CC) -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
+	$(CC) -x c++ -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
 
 $(LIB_NAME): c_src/sass_nif.o
 	mkdir -p priv
