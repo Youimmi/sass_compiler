@@ -25,15 +25,14 @@ defmodule SassTest do
           :scss -> {"sass", %{output_style: code}}
         end
 
-      {:ok, raw_result} = Sass.compile(sources[ext], options)
-      {:ok, raw_file_result} = Sass.compile_file("test/sources/source.#{ext}", options)
+      {:ok, compiled_css} = Sass.compile(sources[ext], options)
+      {:ok, compiled_css_from_file} = Sass.compile_file("test/sources/source.#{ext}", options)
+      css = compiled_css |> squish
+      css_from_file = compiled_css_from_file |> squish
+      expected_css = {ext, style, fixture_css("test/results/#{prefix}.#{style}.css")}
 
-      result = squish(raw_result)
-      file_result = squish(raw_file_result)
-      expected = {ext, style, fixture_css("test/results/#{prefix}.#{style}.css")}
-
-      assert expected == {ext, style, result}
-      assert expected == {ext, style, file_result}
+      assert expected_css == {ext, style, css}
+      assert expected_css == {ext, style, css_from_file}
     end
   end
 
