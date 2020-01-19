@@ -134,7 +134,7 @@ struct Sass_Options *parse_sass_options(ErlNifEnv *env, Sass_Context *context, E
   {
     int output_style;
     enif_get_int(env, value, &output_style);
-    sass_option_set_output_style(options, (Sass_Output_Style)output_style);
+    sass_option_set_output_style(options, Sass_Output_Style(output_style));
   }
   // precision
   key = make_atom(env, SASS_PRECISION);

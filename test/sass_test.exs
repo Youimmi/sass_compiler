@@ -52,6 +52,6 @@ defmodule SassTest do
   end
 
   test "version" do
-    assert Sass.version() == "3.6.3-4-gd91105"
+    assert Sass.version() == "3.6.3-48-g6e7a"
   end
 end
