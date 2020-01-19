@@ -35,7 +35,6 @@ defmodule Sass.Compiler do
     {:error, :nif_library_not_loaded}
   end
 
-  @doc "Call ERL_NIF_INIT"
   defp load_nif do
     :filename.join(:code.priv_dir(:sass_compiler), 'sass_nif')
     |> :erlang.load_nif(0)

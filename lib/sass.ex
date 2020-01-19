@@ -87,10 +87,6 @@ defmodule Sass do
   @spec styles :: keyword(integer)
   def styles, do: @sass_styles
 
-  @doc "Returns an integer code of style"
-  @spec style(atom) :: integer
-  def style(style), do: @sass_styles[style]
-
   @doc "Returns current sass version"
   @spec version :: version
   def version, do: Compiler.version()
