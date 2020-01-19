@@ -21,26 +21,16 @@ defmodule Sass do
 
   alias Sass.Compiler, as: Compiler
 
-  @typedoc "The type describes a tuple of the form {:ok, String.t() } or {:error, :nif_library_not_loaded}"
-  @type compiled :: {:ok, String.t()} | {:error, :nif_library_not_loaded}
-  @typedoc "The type describes a String.t() with version or tuple {:error, :nif_library_not_loaded}"
-  @type version :: String.t() | {:error, :nif_library_not_loaded}
-
   # Sass option values for sass [output style](https://sass-lang.com/documentation/js-api#outputstyle)
   @sass_styles [
-    nested: 0,
-    expanded: 1,
     compact: 2,
-    compressed: 3
+    compressed: 3,
+    expanded: 1,
+    nested: 0
   ]
 
   @doc """
-  Compiles a string of CSS/SCSS/Sass into a string of CSS
-
-  ## Parameters
-
-  * string: CSS/SCSS/Sass String
-  * options: Map of sass options as defined above
+  Compiles a string of CSS/SCSS/Sass into CSS string
 
   ## Examples
 
@@ -53,19 +43,14 @@ defmodule Sass do
       {:ok, "a { color: #fff; }\n"}
 
   """
-  @spec compile(String.t()) :: compiled
-  @spec compile(String.t(), map) :: compiled
-  def compile(source, options \\ %{output_style: @sass_styles[:expanded]}) do
-    source |> String.trim() |> Compiler.compile(options)
+  def compile(source, options \\ %{output_style: default_style()}) do
+    source
+    |> String.trim()
+    |> Compiler.compile(options)
   end
 
   @doc """
-  Compiles a file with CSS/SCSS/Sass into a string of CSS
-
-  ## Parameters
-
-  * path: Path to CSS/SCSS/Sass file to compile
-  * options: Map of sass options as defined above
+  Compiles a file with CSS/SCSS/Sass into CSS string
 
   ## Examples
 
@@ -77,17 +62,15 @@ defmodule Sass do
       {:ok, "a{color:#fff}\n"}
 
   """
-  @spec compile_file(String.t()) :: compiled
-  @spec compile_file(String.t(), map) :: compiled
-  def compile_file(path, options \\ %{output_style: @sass_styles[:expanded]}) do
-    path |> String.trim() |> Compiler.compile_file(options)
+  def compile_file(path, options \\ %{output_style: default_style()}) do
+    path
+    |> String.trim()
+    |> Compiler.compile_file(options)
   end
 
-  @doc "Returns style codes"
-  @spec styles :: keyword(integer)
   def styles, do: @sass_styles
 
-  @doc "Returns current sass version"
-  @spec version :: version
   def version, do: Compiler.version()
+
+  defp default_style, do: @sass_styles[:expanded]
 end

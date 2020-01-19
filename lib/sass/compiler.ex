@@ -20,17 +20,14 @@ defmodule Sass.Compiler do
     end
   end
 
-  @doc "A noop that gets overwritten by the NIF compile"
   def compile(_, _) do
     {:error, :nif_library_not_loaded}
   end
 
-  @doc "A noop that gets overwritten by the NIF compile_file"
   def compile_file(_, _) do
     {:error, :nif_library_not_loaded}
   end
 
-  @doc "A noop that gets overwritten by the NIF compile_file"
   def version do
     {:error, :nif_library_not_loaded}
   end
