@@ -20,29 +20,24 @@ defmodule Sass.Compiler do
     end
   end
 
-  @doc """
-    A noop that gets overwritten by the NIF compile
-  """
+  @doc "A noop that gets overwritten by the NIF compile"
   def compile(_, _) do
-    exit(:nif_library_not_loaded)
+    {:error, :nif_library_not_loaded}
   end
 
-  @doc """
-    A noop that gets overwritten by the NIF compile_file
-  """
+  @doc "A noop that gets overwritten by the NIF compile_file"
   def compile_file(_, _) do
-    exit(:nif_library_not_loaded)
+    {:error, :nif_library_not_loaded}
   end
 
-  @doc """
-    A noop that gets overwritten by the NIF compile_file
-  """
+  @doc "A noop that gets overwritten by the NIF compile_file"
   def version do
-    exit(:nif_library_not_loaded)
+    {:error, :nif_library_not_loaded}
   end
 
+  @doc "Call ERL_NIF_INIT"
   defp load_nif do
-    path = :filename.join(:code.priv_dir(:sass_compiler), 'sass_nif')
-    :erlang.load_nif(path, 0)
+    :filename.join(:code.priv_dir(:sass_compiler), 'sass_nif')
+    |> :erlang.load_nif(0)
   end
 end
