@@ -1,0 +1,18 @@
+// source
+
+.navbar {
+  height: 23px;
+  width: 80%;
+
+  ul {
+    list-style-type: none;
+  };
+
+  li {
+    float: left;
+
+    a {
+      font-weight: bold;
+    }
+  }
+}

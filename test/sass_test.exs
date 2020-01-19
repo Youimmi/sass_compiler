@@ -1,50 +1,44 @@
 defmodule SassTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
-  def scss_string,
-    do:
-      "/* sample_scss.scss */#navbar {width: 80%;height: 23px;ul { list-style-type: none; }; li {float: left; a { font-weight: bold; } } }"
-
-  test "Sass.compile/1 compiles a SCSS string to CSS" do
-    {:ok, expected_css} = File.read("test/sample_scss.css")
-    {:ok, result_css} = scss_string() |> Sass.compile()
-
-    assert expected_css == result_css
+  setup_all do
+    {:ok,
+     sources: [
+       css: File.read!("test/sources/source.css"),
+       sass: File.read!("test/sources/source.sass"),
+       scss: File.read!("test/sources/source.scss")
+     ],
+     extensions: ~w[css sass scss]a,
+     styles: Sass.styles()}
   end
 
-  test "Sass.compile/1 compiles a SCSS string to CSS with output style expanded" do
-    {:ok, expected_css} = File.read("test/expanded.css")
-    {:ok, result_css} = Sass.compile(scss_string(), %{output_style: Sass.sass_style_expanded()})
+  test "Sass.compile/1 and Sass.compile_file/1 compile CSS, Sass and SCSS to CSS", %{
+    extensions: extensions,
+    sources: sources,
+    styles: styles
+  } do
+    for ext <- extensions, {style, code} <- styles do
+      {prefix, options} =
+        case ext do
+          :css -> {"css", %{output_style: code}}
+          :sass -> {"sass", %{is_indented_syntax: true, output_style: code}}
+          :scss -> {"sass", %{output_style: code}}
+        end
 
-    assert expected_css == result_css
-  end
+      {:ok, compiled_css} = Sass.compile(sources[ext], options)
+      {:ok, compiled_css_from_file} = Sass.compile_file("test/sources/source.#{ext}", options)
+      css = compiled_css |> squish
+      css_from_file = compiled_css_from_file |> squish
+      expected_css = {ext, style, fixture_css("test/results/#{prefix}.#{style}.css")}
 
-  test "Sass.compile/1 compiles a SCSS string to CSS with output style compact" do
-    {:ok, expected_css} = File.read("test/compact.css")
-    {:ok, result_css} = Sass.compile(scss_string(), %{output_style: Sass.sass_style_compact()})
-
-    assert expected_css == result_css
-  end
-
-  test "Sass.compile/1 compiles a sass file to CSS" do
-    {:ok, expected_css} = File.read("test/sample_sass.css")
-    {:ok, result_css} = Sass.compile_file("./test/sample_sass.sass")
-
-    assert expected_css == result_css
-  end
-
-  test "Sass.compile/1 compiles a SCSS file to CSS" do
-    {:ok, expected_css} = File.read("test/sample_scss.css")
-    {:ok, result_css} = Sass.compile_file("./test/sample_scss.scss")
-
-    assert expected_css == result_css
+      assert expected_css == {ext, style, css}
+      assert expected_css == {ext, style, css_from_file}
+    end
   end
 
   test "@import works as expected with load path" do
     {:ok, result} =
-      Sass.compile_file("./test/samples/app.scss", %{
-        include_paths: ["#{System.cwd()}/test/samples/folder"]
-      })
+      Sass.compile_file("test/imports/app.scss", %{include_paths: ["test/imports/folder"]})
 
     assert Regex.match?(~r/background-color: #eee;/, result)
     assert Regex.match?(~r/height: 100%;/, result)
@@ -53,5 +47,15 @@ defmodule SassTest do
 
   test "version" do
     assert Sass.version() == "3.6.3-48-g6e7a"
+  end
+
+  defp fixture_css(path) do
+    css =
+      File.read!(path)
+      |> squish
+  end
+
+  defp squish(string) do
+    string |> String.split(~r{\s+}) |> Enum.join(" ")
   end
 end
