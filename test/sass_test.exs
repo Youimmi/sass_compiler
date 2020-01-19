@@ -29,7 +29,6 @@ defmodule SassTest do
       result = raw_result |> squish
       file_result = raw_file_result |> squish
 
-      IO.puts(result)
       assert {ext, style, expected} == {ext, style, result}
       assert {ext, style, expected} == {ext, style, file_result}
     end
