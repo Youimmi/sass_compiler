@@ -50,9 +50,8 @@ defmodule SassTest do
   end
 
   defp fixture_css(path) do
-    css =
-      File.read!(path)
-      |> squish
+    File.read!(path)
+    |> squish
   end
 
   defp squish(string) do

@@ -42,9 +42,9 @@ defmodule SassCompiler.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:credo, "~> 1.1.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.2.0-rc4", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.7", only: :dev, runtime: false},
-      {:elixir_make, "~> 0.5", runtime: false},
+      {:elixir_make, "~> 0.6", runtime: false},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false}
     ]
   end
