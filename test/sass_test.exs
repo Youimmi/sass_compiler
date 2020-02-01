@@ -50,11 +50,14 @@ defmodule SassTest do
   end
 
   defp fixture_css(path) do
-    File.read!(path)
+    path
+    |> File.read!()
     |> squish
   end
 
   defp squish(string) do
-    string |> String.split(~r{\s+}) |> Enum.join(" ")
+    string
+    |> String.split(~r{\s+})
+    |> Enum.join(" ")
   end
 end

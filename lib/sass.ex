@@ -4,18 +4,16 @@ defmodule Sass do
 
   ## Currently supported Sass options
 
-  * [output_style](http://sass-lang.com/documentation/file.SASS_REFERENCE.html#output_style) Use the helpers below to assign the style
+  * [output_style](http://sass-lang.com/documentation/file.SASS_REFERENCE.html#output_style) `integer` - use the helpers below to assign the style
   * precision `integer` - decimal rounding percision
-  * source_comments `true` or `false` - Causes the line number and file where a selector is defined to be emitted into the compiled CSS as a comment
+  * source_comments `true` or `false` - causes the line number and file where a selector is defined to be emitted into the compiled CSS as a comment
   * soure_map_embed `true` or `false`
   * source_map_contents `true` or `false`
   * omit_source_map_url `true` or `false`
   * is_indented_syntax `true` or `false`
   * indent `:tab` or `:space`
   * linefeed `:unix` or `:windows`
-  * include_paths list of directorys for Sass to search for imports ex
-
-      `["bower_compoents", "../node_modules"]`
+  * include_paths `list` - list of directories for Sass to search for imports linked files. Example: `["bower_compoents", "../node_modules"]`
 
   """
 
@@ -36,11 +34,11 @@ defmodule Sass do
 
       iex> sass = "$white : #fff; a { color: $white;}"
       iex> Sass.compile(sass)
-      {:ok, "a {\n  color: #fff; }\n"}
+      {:ok, "a {\\n  color: #fff; }\\n"}
 
       # With options
       iex> Sass.compile(sass, %{output_style: 2})
-      {:ok, "a { color: #fff; }\n"}
+      {:ok, "a { color: #fff; }\\n"}
 
   """
   def compile(source, options \\ %{output_style: default_style()}) do
@@ -55,11 +53,11 @@ defmodule Sass do
   ## Examples
 
       iex> Sass.compile_file("application.scss")
-      {:ok, "a {\n  color: #fff; }\n"}
+      {:ok, "a {\\n  color: #fff; }\\n"}
 
       # With options
       iex> Sass.compile_file("application.scss", %{output_style: 3})
-      {:ok, "a{color:#fff}\n"}
+      {:ok, "a{color:#fff}\\n"}
 
   """
   def compile_file(path, options \\ %{output_style: default_style()}) do
@@ -68,8 +66,16 @@ defmodule Sass do
     |> Compiler.compile_file(options)
   end
 
+  @doc """
+  Returns a keyword list with output_style parameters
+
+  """
   def styles, do: @sass_styles
 
+  @doc """
+  Prints version of LibSass
+
+  """
   def version, do: Compiler.version()
 
   defp default_style, do: @sass_styles[:expanded]

@@ -1,7 +1,7 @@
 defmodule SassCompiler.Mixfile do
   use Mix.Project
 
-  @version "0.1.4"
+  @version "0.1.5"
 
   @description """
   A C/C++ implementation of a Sass compiler for Elixir
