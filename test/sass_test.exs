@@ -1,4 +1,6 @@
 defmodule SassTest do
+  @moduledoc false
+
   use ExUnit.Case, async: true
 
   setup_all do
