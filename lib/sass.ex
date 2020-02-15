@@ -17,7 +17,7 @@ defmodule Sass do
 
   """
 
-  alias Sass.Compiler, as: Compiler
+  alias Sass.Compiler
 
   # Sass option values for sass [output style](https://sass-lang.com/documentation/js-api#outputstyle)
   @sass_styles [
@@ -65,12 +65,6 @@ defmodule Sass do
     |> String.trim()
     |> Compiler.compile_file(options)
   end
-
-  @doc """
-  Returns a keyword list with output_style parameters
-
-  """
-  def styles, do: @sass_styles
 
   @doc """
   Prints version of LibSass

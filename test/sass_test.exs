@@ -9,7 +9,7 @@ defmodule SassTest do
        scss: File.read!("test/sources/source.scss")
      ],
      extensions: ~w[css sass scss]a,
-     styles: Sass.styles()}
+     styles: [compact: 2, compressed: 3, expanded: 1, nested: 0]}
   end
 
   test "Sass.compile/1 and Sass.compile_file/1 compile CSS, Sass and SCSS to CSS", %{
