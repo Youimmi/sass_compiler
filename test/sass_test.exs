@@ -3,12 +3,14 @@ defmodule SassTest do
 
   use ExUnit.Case, async: true
 
+  import Support.TestHelpers
+
   setup_all do
     {:ok,
      sources: [
-       css: File.read!("test/sources/source.css"),
-       sass: File.read!("test/sources/source.sass"),
-       scss: File.read!("test/sources/source.scss")
+       css: File.read!("test/fixtures/source.css"),
+       sass: File.read!("test/fixtures/source.sass"),
+       scss: File.read!("test/fixtures/source.scss")
      ],
      extensions: ~w[css sass scss]a,
      styles: [compact: 2, compressed: 3, expanded: 1, nested: 0]}
@@ -28,10 +30,10 @@ defmodule SassTest do
         end
 
       {:ok, compiled_css} = Sass.compile(sources[ext], options)
-      {:ok, compiled_css_from_file} = Sass.compile_file("test/sources/source.#{ext}", options)
+      {:ok, compiled_css_from_file} = Sass.compile_file("test/fixtures/source.#{ext}", options)
       css = compiled_css |> squish
       css_from_file = compiled_css_from_file |> squish
-      expected_css = {ext, style, fixture_css("test/results/#{prefix}.#{style}.css")}
+      expected_css = {ext, style, fixture_css("test/fixtures/#{prefix}.#{style}.css")}
 
       assert expected_css == {ext, style, css}
       assert expected_css == {ext, style, css_from_file}
@@ -40,7 +42,7 @@ defmodule SassTest do
 
   test "@import works as expected with load path" do
     {:ok, result} =
-      Sass.compile_file("test/imports/app.scss", %{include_paths: ["test/imports/folder"]})
+      Sass.compile_file("test/fixtures/app.scss", %{include_paths: ["test/fixtures/folder"]})
 
     assert Regex.match?(~r/background-color: #eee;/, result)
     assert Regex.match?(~r/height: 100%;/, result)
@@ -49,17 +51,5 @@ defmodule SassTest do
 
   test "version" do
     assert Sass.version() == "3.6.3-48-g6e7a"
-  end
-
-  defp fixture_css(path) do
-    path
-    |> File.read!()
-    |> squish()
-  end
-
-  defp squish(string) do
-    string
-    |> String.split(~r{\s+})
-    |> Enum.join(" ")
   end
 end

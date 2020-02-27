@@ -19,14 +19,6 @@ defmodule Sass do
 
   alias Sass.Compiler
 
-  # Sass option values for sass [output style](https://sass-lang.com/documentation/js-api#outputstyle)
-  @sass_styles [
-    compact: 2,
-    compressed: 3,
-    expanded: 1,
-    nested: 0
-  ]
-
   @doc """
   Compiles a string of CSS/SCSS/Sass into CSS string
 
@@ -41,7 +33,7 @@ defmodule Sass do
       {:ok, "a { color: #fff; }\\n"}
 
   """
-  def compile(source, options \\ %{output_style: default_style()}) do
+  def compile(source, options \\ %{}) do
     source
     |> String.trim()
     |> Compiler.compile(options)
@@ -60,7 +52,7 @@ defmodule Sass do
       {:ok, "a{color:#fff}\\n"}
 
   """
-  def compile_file(path, options \\ %{output_style: default_style()}) do
+  def compile_file(path, options \\ %{}) do
     path
     |> String.trim()
     |> Compiler.compile_file(options)
@@ -71,6 +63,4 @@ defmodule Sass do
 
   """
   def version, do: Compiler.version()
-
-  defp default_style, do: @sass_styles[:expanded]
 end
