@@ -35,7 +35,7 @@ ifeq ($J,)
 ifeq ($(OS),Linux)
   NPROCS := $(shell grep -c ^processor /proc/cpuinfo)
 else ifeq ($(OS),Darwin)
-  NPROCS := $(shell nproc)
+  NPROCS := $(shell sysctl -n hw.logicalcpu)
 endif # $(OS)
 
 else
