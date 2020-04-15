@@ -5,11 +5,13 @@ defmodule SassTest do
 
   import Support.TestHelpers
 
+  @fixtures_path "test/fixtures/"
+
   setup_all do
     extensions = ~w[css sass scss]a
 
     {:ok,
-     sources: Enum.map(extensions, &{&1, "test/fixtures/source.#{&1}"}),
+     sources: Enum.map(extensions, &{&1, "#{@fixtures_path}source.#{&1}"}),
      extensions: extensions,
      styles: [compact: 2, compressed: 3, expanded: 1, nested: 0]}
   end
@@ -25,10 +27,10 @@ defmodule SassTest do
 
         compiled = [
           compile(sources[ext_name], options),
-          compile_file("test/fixtures/source.#{ext_name}", options)
+          compile_file("#{@fixtures_path}source.#{ext_name}", options)
         ]
 
-        expected = {ext_name, style, fixture_css("test/fixtures/#{prefix}.#{style}.css")}
+        expected = {ext_name, style, fixture_css("#{@fixtures_path}#{prefix}.#{style}.css")}
 
         Stream.each(compiled, fn result ->
           assert expected == {ext_name, style, result}
@@ -42,7 +44,7 @@ defmodule SassTest do
 
   test "@import works as expected with load path" do
     {:ok, result} =
-      Sass.compile_file("test/fixtures/app.scss", %{include_paths: ["test/fixtures/folder"]})
+      Sass.compile_file("#{@fixtures_path}app.scss", %{include_paths: ["#{@fixtures_path}folder"]})
 
     patterns = [
       ~r/background-color: #eee;/,
