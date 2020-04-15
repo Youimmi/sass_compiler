@@ -6,13 +6,11 @@ defmodule SassTest do
   import Support.TestHelpers
 
   setup_all do
+    extensions = ~w[css sass scss]a
+
     {:ok,
-     sources: [
-       css: File.read!("test/fixtures/source.css"),
-       sass: File.read!("test/fixtures/source.sass"),
-       scss: File.read!("test/fixtures/source.scss")
-     ],
-     extensions: ~w[css sass scss]a,
+     sources: Enum.map(extensions, &{&1, "test/fixtures/source.#{&1}"}),
+     extensions: extensions,
      styles: [compact: 2, compressed: 3, expanded: 1, nested: 0]}
   end
 
@@ -21,22 +19,20 @@ defmodule SassTest do
     sources: sources,
     styles: styles
   } do
-    for ext <- extensions, {style, code} <- styles do
-      {prefix, options} =
-        case ext do
-          :css -> {"css", %{output_style: code}}
-          :sass -> {"sass", %{is_indented_syntax: true, output_style: code}}
-          :scss -> {"sass", %{output_style: code}}
-        end
+    for ext_name <- extensions, {style, code} <- styles do
+      {prefix, options} = style_options(ext_name, code)
 
-      {:ok, compiled_css} = Sass.compile(sources[ext], options)
-      {:ok, compiled_css_from_file} = Sass.compile_file("test/fixtures/source.#{ext}", options)
-      css = compiled_css |> squish
-      css_from_file = compiled_css_from_file |> squish
-      expected_css = {ext, style, fixture_css("test/fixtures/#{prefix}.#{style}.css")}
+      compiled = [
+        compile(sources[ext_name], options),
+        compile_file("test/fixtures/source.#{ext_name}", options)
+      ]
 
-      assert expected_css == {ext, style, css}
-      assert expected_css == {ext, style, css_from_file}
+      expected = {ext_name, style, fixture_css("test/fixtures/#{prefix}.#{style}.css")}
+
+      Stream.each(compiled, fn result ->
+        assert expected == {ext_name, style, result}
+      end)
+      |> Enum.to_list()
     end
   end
 
@@ -50,6 +46,6 @@ defmodule SassTest do
   end
 
   test "version" do
-    assert Sass.version() == "3.6.3-48-g6e7a"
+    assert Sass.version() == "3.6.3-55-g8f59b"
   end
 end
