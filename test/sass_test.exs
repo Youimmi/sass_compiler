@@ -19,30 +19,41 @@ defmodule SassTest do
     sources: sources,
     styles: styles
   } do
-    for ext_name <- extensions, {style, code} <- styles do
-      {prefix, options} = style_options(ext_name, code)
+    Stream.each(extensions, fn ext_name ->
+      Stream.each(styles, fn {style, code} ->
+        {prefix, options} = style_options(ext_name, code)
 
-      compiled = [
-        compile(sources[ext_name], options),
-        compile_file("test/fixtures/source.#{ext_name}", options)
-      ]
+        compiled = [
+          compile(sources[ext_name], options),
+          compile_file("test/fixtures/source.#{ext_name}", options)
+        ]
 
-      expected = {ext_name, style, fixture_css("test/fixtures/#{prefix}.#{style}.css")}
+        expected = {ext_name, style, fixture_css("test/fixtures/#{prefix}.#{style}.css")}
 
-      Stream.each(compiled, fn result ->
-        assert expected == {ext_name, style, result}
+        Stream.each(compiled, fn result ->
+          assert expected == {ext_name, style, result}
+        end)
+        |> Enum.to_list()
       end)
       |> Enum.to_list()
-    end
+    end)
+    |> Enum.to_list()
   end
 
   test "@import works as expected with load path" do
     {:ok, result} =
       Sass.compile_file("test/fixtures/app.scss", %{include_paths: ["test/fixtures/folder"]})
 
-    assert Regex.match?(~r/background-color: #eee;/, result)
-    assert Regex.match?(~r/height: 100%;/, result)
-    assert Regex.match?(~r/bar: baz;/, result)
+    patterns = [
+      ~r/background-color: #eee;/,
+      ~r/height: 100%;/,
+      ~r/bar: baz;/
+    ]
+
+    Stream.each(patterns, fn pattern ->
+      assert Regex.match?(pattern, result)
+    end)
+    |> Enum.to_list()
   end
 
   test "version" do
