@@ -5,14 +5,14 @@ defmodule SassTest do
 
   import Support.TestHelpers
 
+  @fixtures_path "test/fixtures/"
+
   setup_all do
+    extensions = ~w[css sass scss]a
+
     {:ok,
-     sources: [
-       css: File.read!("test/fixtures/source.css"),
-       sass: File.read!("test/fixtures/source.sass"),
-       scss: File.read!("test/fixtures/source.scss")
-     ],
-     extensions: ~w[css sass scss]a,
+     sources: Enum.map(extensions, &{&1, "#{@fixtures_path}source.#{&1}"}),
+     extensions: extensions,
      styles: [compact: 2, compressed: 3, expanded: 1, nested: 0]}
   end
 
@@ -21,35 +21,44 @@ defmodule SassTest do
     sources: sources,
     styles: styles
   } do
-    for ext <- extensions, {style, code} <- styles do
-      {prefix, options} =
-        case ext do
-          :css -> {"css", %{output_style: code}}
-          :sass -> {"sass", %{is_indented_syntax: true, output_style: code}}
-          :scss -> {"sass", %{output_style: code}}
-        end
+    Stream.each(extensions, fn ext_name ->
+      Stream.each(styles, fn {style, code} ->
+        {prefix, options} = style_options(ext_name, code)
 
-      {:ok, compiled_css} = Sass.compile(sources[ext], options)
-      {:ok, compiled_css_from_file} = Sass.compile_file("test/fixtures/source.#{ext}", options)
-      css = compiled_css |> squish
-      css_from_file = compiled_css_from_file |> squish
-      expected_css = {ext, style, fixture_css("test/fixtures/#{prefix}.#{style}.css")}
+        compiled = [
+          compile(sources[ext_name], options),
+          compile_file("#{@fixtures_path}source.#{ext_name}", options)
+        ]
 
-      assert expected_css == {ext, style, css}
-      assert expected_css == {ext, style, css_from_file}
-    end
+        expected = {ext_name, style, fixture_css("#{@fixtures_path}#{prefix}.#{style}.css")}
+
+        Stream.each(compiled, fn result ->
+          assert expected == {ext_name, style, result}
+        end)
+        |> Enum.to_list()
+      end)
+      |> Enum.to_list()
+    end)
+    |> Enum.to_list()
   end
 
   test "@import works as expected with load path" do
     {:ok, result} =
-      Sass.compile_file("test/fixtures/app.scss", %{include_paths: ["test/fixtures/folder"]})
+      Sass.compile_file("#{@fixtures_path}app.scss", %{include_paths: ["#{@fixtures_path}folder"]})
 
-    assert Regex.match?(~r/background-color: #eee;/, result)
-    assert Regex.match?(~r/height: 100%;/, result)
-    assert Regex.match?(~r/bar: baz;/, result)
+    patterns = [
+      ~r/background-color: #eee;/,
+      ~r/height: 100%;/,
+      ~r/bar: baz;/
+    ]
+
+    Stream.each(patterns, fn pattern ->
+      assert Regex.match?(pattern, result)
+    end)
+    |> Enum.to_list()
   end
 
   test "version" do
-    assert Sass.version() == "3.6.3-48-g6e7a"
+    assert Sass.version() == "3.6.3-57-g9515"
   end
 end
