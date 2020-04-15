@@ -3,6 +3,10 @@ LibSass Nif for elixir
 
 [![.github/workflows/CI.yml](https://github.com/Youimmi/sass_compiler/workflows/.github/workflows/CI.yml/badge.svg?branch=master)](https://github.com/Youimmi/sass_compiler)
 
+## Documentation
+
+API documentation is available at [https://hexdocs.pm/sass_compiler/Sass.html](https://hexdocs.pm/sass_compiler/Sass.html)
+
 ## Installation
 
 Add `sass_compiler` to your list of dependencies in `mix.exs`:
