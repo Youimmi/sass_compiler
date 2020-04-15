@@ -1,5 +1,5 @@
 # SassCompiler
-LibSass Nif for elixir.
+LibSass Nif for elixir
 
 [![.github/workflows/CI.yml](https://github.com/Youimmi/sass_compiler/workflows/.github/workflows/CI.yml/badge.svg?branch=master)](https://github.com/Youimmi/sass_compiler)
 
