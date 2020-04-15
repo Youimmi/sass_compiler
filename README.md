@@ -1,3 +1,5 @@
+![.github/workflows/CI.yml](https://github.com/Youimmi/sass_compiler/workflows/.github/workflows/CI.yml/badge.svg?branch=master)
+
 # SassCompiler
 LibSass Nif for elixir
 
