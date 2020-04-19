@@ -15,13 +15,12 @@ defmodule Support.TestHelpers do
   def style_options(:sass, code), do: {"sass", %{is_indented_syntax: true, output_style: code}}
   def style_options(:scss, code), do: {"sass", %{output_style: code}}
 
-  def compile(path, options) do
-    {:ok, css} = Sass.compile(File.read!(path), options)
-    css |> squish
-  end
+  def compile("", options),
+    do: with({:error, error} = Sass.compile("", options), do: error)
 
-  def compile_file(path, options) do
-    {:ok, css} = Sass.compile_file(path, options)
-    css |> squish
-  end
+  def compile(content, options),
+    do: with({:ok, css} = Sass.compile(content, options), do: css |> squish)
+
+  def compile_file(path, options),
+    do: with({:ok, css} = Sass.compile_file(path, options), do: css |> squish)
 end

@@ -26,14 +26,14 @@ defmodule SassTest do
         {prefix, options} = style_options(ext_name, code)
 
         compiled = [
-          compile(sources[ext_name], options),
+          compile(sources[ext_name] |> File.read!(), options),
           compile_file("#{@fixtures_path}source.#{ext_name}", options)
         ]
 
-        expected = {ext_name, style, fixture_css("#{@fixtures_path}#{prefix}.#{style}.css")}
+        expected = fixture_css("#{@fixtures_path}#{prefix}.#{style}.css")
 
         Stream.each(compiled, fn result ->
-          assert expected == {ext_name, style, result}
+          assert {ext_name, style, expected} == {ext_name, style, result}
         end)
         |> Enum.to_list()
       end)
@@ -42,9 +42,42 @@ defmodule SassTest do
     |> Enum.to_list()
   end
 
+  test "Sass.compile/1 returns error if an empty string is passed", %{
+    extensions: extensions,
+    styles: styles
+  } do
+    Stream.each(extensions, fn ext_name ->
+      Stream.each(styles, fn {style, code} ->
+        {_, options} = style_options(ext_name, code)
+        expected = "Internal Error: Data context created with empty source string\n"
+        result = compile("", options)
+
+        assert {ext_name, style, expected} == {ext_name, style, result}
+      end)
+      |> Enum.to_list()
+    end)
+    |> Enum.to_list()
+  end
+
+  test "Sass.compile_file/1 return \"\" if an empty file is passed", %{
+    extensions: extensions,
+    styles: styles
+  } do
+    Stream.each(extensions, fn ext_name ->
+      Stream.each(styles, fn {style, code} ->
+        {_, options} = style_options(ext_name, code)
+        result = compile_file("#{@fixtures_path}blank.#{ext_name}", options)
+
+        assert {ext_name, style, ""} == {ext_name, style, result}
+      end)
+      |> Enum.to_list()
+    end)
+    |> Enum.to_list()
+  end
+
   test "@import works as expected with load path" do
-    {:ok, result} =
-      Sass.compile_file("#{@fixtures_path}app.scss", %{include_paths: ["#{@fixtures_path}folder"]})
+    options = %{include_paths: ["#{@fixtures_path}folder"]}
+    result = compile_file("#{@fixtures_path}app.scss", options)
 
     patterns = [
       ~r/background-color: #eee;/,
