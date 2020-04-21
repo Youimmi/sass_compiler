@@ -50,7 +50,7 @@ libsass-clean:
 	$(MAKE) -C $(SASS_DIR) clean
 
 libsass-make:
-	$(MAKE) -C $(SASS_DIR) -j$(NPROCS)
+	$(MAKE) -C $(SASS_DIR) -j$(NPROCS) -s
 
 %.o: %.c
 	$(CC) -x c++ -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
