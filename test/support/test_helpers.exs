@@ -1,15 +1,15 @@
 defmodule Support.TestHelpers do
-  def fixture_css(path) do
-    path
-    |> File.read!()
-    |> squish()
-  end
+  @moduledoc false
 
-  def squish(string) do
-    string
-    |> String.split(~r{\s+})
-    |> Enum.join(" ")
-  end
+  import ExUnit.Assertions, only: [assert: 1]
+
+  def assert_async(results, expected, function),
+    do: perform_async(results, &assert(function.(expected, &1)))
+
+  def perform_async(enumerable, function),
+    do: Stream.each(enumerable, &function.(&1)) |> Stream.run()
+
+  def fixture_css(path), do: File.read!(path)
 
   def style_options(:css, code), do: {"css", %{output_style: code}}
   def style_options(:sass, code), do: {"sass", %{is_indented_syntax: true, output_style: code}}
@@ -19,8 +19,8 @@ defmodule Support.TestHelpers do
     do: with({:error, error} <- Sass.compile("", options), do: error)
 
   def compile(content, options),
-    do: with({:ok, css} <- Sass.compile(content, options), do: css |> squish)
+    do: with({:ok, css} <- Sass.compile(content, options), do: css)
 
   def compile_file(path, options),
-    do: with({:ok, css} <- Sass.compile_file(path, options), do: css |> squish)
+    do: with({:ok, css} <- Sass.compile_file(path, options), do: css)
 end

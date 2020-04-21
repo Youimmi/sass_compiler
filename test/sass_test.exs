@@ -21,65 +21,57 @@ defmodule SassTest do
     sources: sources,
     styles: styles
   } do
-    Stream.each(extensions, fn ext_name ->
-      Stream.each(styles, fn {style, code} ->
+    perform_async(extensions, fn ext_name ->
+      perform_async(styles, fn {style, code} ->
         {prefix, options} = style_options(ext_name, code)
 
-        compiled = [
-          compile(sources[ext_name] |> File.read!(), options),
-          compile_file(@fixtures_path <> "source.#{ext_name}", options)
-        ]
-
-        expected = fixture_css(@fixtures_path <> "#{prefix}.#{style}.css")
-
-        Stream.each(compiled, fn result ->
-          assert {ext_name, style, expected} == {ext_name, style, result}
-        end)
-        |> Enum.to_list()
+        assert_async(
+          [
+            compile(sources[ext_name] |> File.read!(), options),
+            compile_file(@fixtures_path <> "source.#{ext_name}", options)
+          ],
+          fixture_css(@fixtures_path <> "#{prefix}.#{style}.css"),
+          &({ext_name, style, &2} == {ext_name, style, &1})
+        )
       end)
-      |> Enum.to_list()
     end)
-    |> Enum.to_list()
   end
 
   test "Sass.compile/1 returns error if an empty string is passed", %{
     extensions: extensions,
     styles: styles
   } do
-    Stream.each(extensions, fn ext_name ->
-      Stream.each(styles, fn {style, code} ->
-        {_, options} = style_options(ext_name, code)
-        expected = "Internal Error: Data context created with empty source string\n"
-        result = compile("", options)
-        assert {ext_name, style, expected} == {ext_name, style, result}
-      end)
-      |> Enum.to_list()
+    perform_async(extensions, fn ext_name ->
+      assert_async(
+        styles,
+        "Internal Error: Data context created with empty source string\n",
+        fn expected, {style, code} ->
+          {_, options} = style_options(ext_name, code)
+          {ext_name, style, expected} == {ext_name, style, compile("", options)}
+        end
+      )
     end)
-    |> Enum.to_list()
   end
 
   test "Sass.compile_file/1 returns \"\" if an empty file is passed", %{
     extensions: extensions,
     styles: styles
   } do
-    Stream.each(extensions, fn ext_name ->
-      Stream.each(styles, fn {style, code} ->
+    perform_async(extensions, fn ext_name ->
+      assert_async(styles, "", fn expected, {style, code} ->
         {_, options} = style_options(ext_name, code)
         result = compile_file(@fixtures_path <> "blank.#{ext_name}", options)
-        assert {ext_name, style, ""} == {ext_name, style, result}
+        {ext_name, style, expected} == {ext_name, style, result}
       end)
-      |> Enum.to_list()
     end)
-    |> Enum.to_list()
   end
 
   test "@import works as expected with load path" do
-    result =
-      compile_file(@fixtures_path <> "app.scss", %{include_paths: [@fixtures_path <> "import"]})
-
-    assert result =~ ~r/background-color: #eee;/
-    assert result =~ ~r/height: 100%;/
-    assert result =~ ~r/bar: baz;/
+    assert_async(
+      [~r/background-color: #eee;/, ~r/height: 100%;/, ~r/bar: baz;/],
+      compile_file(@fixtures_path <> "app.scss", %{include_paths: [@fixtures_path <> "import"]}),
+      &Regex.match?(&2, &1)
+    )
   end
 
   test "version" do

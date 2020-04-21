@@ -3,12 +3,11 @@
   height: 23px;
   width: 80%; }
 
-  .navbar ul {
+.navbar ul {
   list-style-type: none; }
 
-  .navbar li {
+.navbar li {
   float: left; }
 
-  .navbar li a {
+.navbar li a {
   font-weight: bold; }
-
