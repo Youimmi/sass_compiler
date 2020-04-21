@@ -14,7 +14,7 @@ Add `sass_compiler` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:sass_compiler, "~> 0.1.9"}
+    {:sass_compiler, "~> 0.1"}
   ]
 end
 ```
