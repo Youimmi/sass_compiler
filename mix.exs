@@ -20,8 +20,6 @@ defmodule SassCompiler.Mixfile do
       description: @description,
       package: package(),
       deps: deps(),
-      test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test],
       source_url: "https://github.com/Youimmi/sass_compiler"
     ]
   end
@@ -49,8 +47,7 @@ defmodule SassCompiler.Mixfile do
       {:credo, "~> 1.4.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:elixir_make, "~> 0.6", runtime: false},
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.12.3", only: :test}
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
     ]
   end
 end
