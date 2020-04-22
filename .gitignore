@@ -26,6 +26,10 @@
 # Ignore package tarball (built via "mix hex.build").
 sass_compiler-*
 
+# Ignore Dialyze files
+*.plt
+*.plt.hash
+
 # Ignore compiled C/C++ files
 *.o
 *.so
