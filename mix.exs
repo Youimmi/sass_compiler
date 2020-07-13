@@ -3,7 +3,7 @@ defmodule SassCompiler.Mixfile do
 
   use Mix.Project
 
-  @version "0.1.10"
+  @version "0.1.11"
 
   @description """
   A C/C++ implementation of a Sass compiler for Elixir
@@ -44,10 +44,10 @@ defmodule SassCompiler.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:credo, "~> 1.4.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:elixir_make, "~> 0.6", runtime: false},
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.22", only: :dev, runtime: false}
     ]
   end
 end
