@@ -73,8 +73,4 @@ defmodule SassTest do
       &Regex.match?(&2, &1)
     )
   end
-
-  test "version" do
-    assert "3.6.4-10-gf4cd" =~ Sass.version()
-  end
 end
