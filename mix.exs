@@ -20,6 +20,7 @@ defmodule SassCompiler.Mixfile do
       description: @description,
       package: package(),
       deps: deps(),
+      aliases: aliases(),
       source_url: "https://github.com/Youimmi/sass_compiler"
     ]
   end
@@ -48,6 +49,22 @@ defmodule SassCompiler.Mixfile do
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:elixir_make, "~> 0.6", runtime: false},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false}
+    ]
+  end
+
+  # Aliases are shortcuts or tasks specific to the current project.
+  # For example, to install project dependencies and perform other setup tasks, run:
+  #
+  #     $ mix setup
+  #
+  # See the documentation for `Mix` for more info on aliases.
+  defp aliases do
+    [
+      update: [
+        "cmd rm -rf _build .elixir_ls deps erl_crash.dump mix.lock",
+        "cmd cd libsass && git pull https://github.com/sass/libsass",
+        "deps.get"
+      ]
     ]
   end
 end
