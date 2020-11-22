@@ -1,7 +1,7 @@
 # SassCompiler
 LibSass Nif for elixir
 
-[![CI](https://github.com/Youimmi/sass_compiler/workflows/CI/badge.svg?branch=master&event=push)](https://github.com/Youimmi/sass_compiler) [![hex.pm version](https://img.shields.io/hexpm/v/sass_compiler.svg)](https://hex.pm/packages/sass_compiler)
+[![CI](https://github.com/Youimmi/sass_compiler/workflows/CI/badge.svg?branch=main&event=push)](https://github.com/Youimmi/sass_compiler) [![hex.pm version](https://img.shields.io/hexpm/v/sass_compiler.svg)](https://hex.pm/packages/sass_compiler)
 
 ## Documentation
 
