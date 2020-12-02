@@ -2,8 +2,17 @@ defmodule SassTest do
   @moduledoc false
 
   use ExUnit.Case, async: true
+  import ExUnit.Callbacks, only: [setup_all: 1]
 
-  import Support.TestHelpers
+  import Support.TestHelpers,
+    only: [
+      assert_async: 3,
+      compile: 2,
+      compile_file: 2,
+      fixture_css: 1,
+      perform_async: 2,
+      style_options: 2
+    ]
 
   @fixtures_path "test/fixtures/"
 
