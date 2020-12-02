@@ -17,19 +17,16 @@ defmodule SassTest do
   @fixtures_path "test/fixtures/"
 
   setup_all do
-    extensions = ~w[css sass scss]a
-
     {:ok,
-     sources: Enum.map(extensions, &{&1, @fixtures_path <> "source.#{&1}"}),
-     extensions: extensions,
-     styles: [compact: 2, compressed: 3, expanded: 1, nested: 0]}
+     extensions: ~w[css sass scss]a, styles: [compact: 2, compressed: 3, expanded: 1, nested: 0]}
   end
 
-  test "Sass.compile/2 and Sass.compile_file/2 compile CSS, Sass and SCSS to CSS", %{
+  test "Sass.compile/2 and Sass.compile_file/2 compiles CSS, Sass or SCSS to CSS", %{
     extensions: extensions,
-    sources: sources,
     styles: styles
   } do
+    sources = Enum.map(extensions, &{&1, @fixtures_path <> "source.#{&1}"})
+
     perform_async(extensions, fn ext_name ->
       perform_async(styles, fn {style, code} ->
         {prefix, options} = style_options(ext_name, code)
@@ -40,7 +37,7 @@ defmodule SassTest do
             compile_file(@fixtures_path <> "source.#{ext_name}", options)
           ],
           fixture_css(@fixtures_path <> "#{prefix}.#{style}.css"),
-          &({ext_name, style, &2} == {ext_name, style, &1})
+          &(&2 == &1)
         )
       end)
     end)
@@ -54,9 +51,10 @@ defmodule SassTest do
       assert_async(
         styles,
         "Internal Error: Data context created with empty source string\n",
-        fn expected, {style, code} ->
+        fn expected, {_style, code} ->
           {_, options} = style_options(ext_name, code)
-          {ext_name, style, expected} == {ext_name, style, compile("", options)}
+
+          expected == compile("", options)
         end
       )
     end)
@@ -66,11 +64,14 @@ defmodule SassTest do
     extensions: extensions,
     styles: styles
   } do
+    sources = Enum.map(extensions, &{&1, @fixtures_path <> "blank.#{&1}"})
+
     perform_async(extensions, fn ext_name ->
-      assert_async(styles, "", fn expected, {style, code} ->
+      assert_async(styles, "", fn expected, {_style, code} ->
         {_, options} = style_options(ext_name, code)
-        result = compile_file(@fixtures_path <> "blank.#{ext_name}", options)
-        {ext_name, style, expected} == {ext_name, style, result}
+        result = compile_file(sources[ext_name], options)
+
+        expected == result
       end)
     end)
   end
