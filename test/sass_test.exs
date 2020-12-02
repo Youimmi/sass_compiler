@@ -25,7 +25,7 @@ defmodule SassTest do
      styles: [compact: 2, compressed: 3, expanded: 1, nested: 0]}
   end
 
-  test "Sass.compile/1 and Sass.compile_file/1 compile CSS, Sass and SCSS to CSS", %{
+  test "Sass.compile/2 and Sass.compile_file/2 compile CSS, Sass and SCSS to CSS", %{
     extensions: extensions,
     sources: sources,
     styles: styles
@@ -46,7 +46,7 @@ defmodule SassTest do
     end)
   end
 
-  test "Sass.compile/1 returns error if an empty string is passed", %{
+  test "Sass.compile/2 returns error if an empty string is passed", %{
     extensions: extensions,
     styles: styles
   } do
@@ -62,7 +62,7 @@ defmodule SassTest do
     end)
   end
 
-  test "Sass.compile_file/1 returns \"\" if an empty file is passed", %{
+  test "Sass.compile_file/2 returns \"\" if an empty file is passed", %{
     extensions: extensions,
     styles: styles
   } do
