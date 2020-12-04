@@ -1,11 +1,6 @@
 defmodule Support.TestHelpers do
   @moduledoc false
 
-  import ExUnit.Assertions, only: [assert: 1]
-
-  def assert_async(results, expected, function),
-    do: perform_async(results, &assert(function.(expected, &1)))
-
   def perform_async(enumerable, function),
     do: Stream.each(enumerable, &function.(&1)) |> Stream.run()
 

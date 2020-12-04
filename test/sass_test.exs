@@ -2,11 +2,10 @@ defmodule SassTest do
   @moduledoc false
 
   use ExUnit.Case, async: true
-  import ExUnit.Callbacks, only: [setup_all: 1]
+  import ExUnit.Assertions, only: [assert: 1]
 
   import Support.TestHelpers,
     only: [
-      assert_async: 3,
       compile: 2,
       compile_file: 2,
       fixture_css: 1,
@@ -14,73 +13,60 @@ defmodule SassTest do
       style_options: 2
     ]
 
+  ExUnit.Case.register_describe_attribute(__MODULE__, :describe_fixtures)
+
   @fixtures_path "test/fixtures/"
 
-  setup_all do
-    {:ok,
-     extensions: ~w[css sass scss]a, styles: [compact: 2, compressed: 3, expanded: 1, nested: 0]}
-  end
+  perform_async([css: "CSS", sass: "Sass", scss: "SCSS"], fn {ext, ext_name} ->
+    source_file_path = @fixtures_path <> "source.#{ext}"
+    blank_file_path = @fixtures_path <> "blank.#{ext}"
 
-  test "Sass.compile/2 and Sass.compile_file/2 compiles CSS, Sass or SCSS to CSS", %{
-    extensions: extensions,
-    styles: styles
-  } do
-    sources = Enum.map(extensions, &{&1, @fixtures_path <> "source.#{&1}"})
+    describe "Compile the #{ext_name} file" do
+      perform_async([compact: 2, compressed: 3, expanded: 1, nested: 0], fn {style, code} ->
+        {prefix, options} = style_options(ext, code)
+        expected_css = fixture_css(@fixtures_path <> "#{prefix}.#{style}.css")
 
-    perform_async(extensions, fn ext_name ->
-      perform_async(styles, fn {style, code} ->
-        {prefix, options} = style_options(ext_name, code)
+        test "Sass.compile/2 compiles #{ext_name} to CSS #{ext_name} (#{style})" do
+          result = unquote(compile(File.read!(source_file_path), options))
 
-        assert_async(
-          [
-            compile(sources[ext_name] |> File.read!(), options),
-            compile_file(@fixtures_path <> "source.#{ext_name}", options)
-          ],
-          fixture_css(@fixtures_path <> "#{prefix}.#{style}.css"),
-          &(&2 == &1)
-        )
-      end)
-    end)
-  end
-
-  test "Sass.compile/2 returns error if an empty string is passed", %{
-    extensions: extensions,
-    styles: styles
-  } do
-    perform_async(extensions, fn ext_name ->
-      assert_async(
-        styles,
-        "Internal Error: Data context created with empty source string\n",
-        fn expected, {_style, code} ->
-          {_, options} = style_options(ext_name, code)
-
-          expected == compile("", options)
+          assert(result == unquote(expected_css))
         end
-      )
-    end)
-  end
 
-  test "Sass.compile_file/2 returns \"\" if an empty file is passed", %{
-    extensions: extensions,
-    styles: styles
-  } do
-    sources = Enum.map(extensions, &{&1, @fixtures_path <> "blank.#{&1}"})
+        test "Sass.compile_file/2 compiles #{ext_name} to CSS #{ext_name} (#{style})" do
+          result = unquote(compile_file(source_file_path, options))
 
-    perform_async(extensions, fn ext_name ->
-      assert_async(styles, "", fn expected, {_style, code} ->
-        {_, options} = style_options(ext_name, code)
-        result = compile_file(sources[ext_name], options)
+          assert(result == unquote(expected_css))
+        end
 
-        expected == result
+        test "Sass.compile/2 returns error if a blank #{ext_name} string is passed (#{style})" do
+          result = unquote(compile("", options))
+
+          assert(result == "Internal Error: Data context created with empty source string\n")
+        end
+
+        test "Sass.compile_file/2 returns \"\" if a blank #{ext_name} file is passed (#{style})" do
+          result = unquote(compile_file(blank_file_path, options))
+
+          assert(result == "")
+        end
       end)
-    end)
-  end
+    end
+  end)
 
-  test "@import works as expected with load path" do
-    assert_async(
-      [~r/background-color: #eee;/, ~r/height: 100%;/, ~r/bar: baz;/],
-      compile_file(@fixtures_path <> "app.scss", %{include_paths: [@fixtures_path <> "import"]}),
-      &Regex.match?(&2, &1)
+  describe "Compile imported files" do
+    @result compile_file(@fixtures_path <> "app.scss", %{
+              include_paths: [@fixtures_path <> "import"]
+            })
+
+    perform_async(
+      ["background-color: #eee;", "height: 100%;", "bar: baz;"],
+      fn expected_string ->
+        test "@import works as expected with load path (#{expected_string})" do
+          expected = ~r/#{unquote(expected_string)}/
+
+          assert(Regex.match?(expected, @result))
+        end
+      end
     )
   end
 end
