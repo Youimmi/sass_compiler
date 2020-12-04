@@ -26,13 +26,13 @@ defmodule SassTest do
         {prefix, options} = style_options(ext, code)
         expected_css = fixture_css(@fixtures_path <> "#{prefix}.#{style}.css")
 
-        test "Sass.compile/2 compiles #{ext_name} to CSS (#{style})" do
+        test "Sass.compile/2 compiles #{ext_name} into CSS (#{style})" do
           result = unquote(compile(File.read!(source_file_path), options))
 
           assert(result == unquote(expected_css))
         end
 
-        test "Sass.compile_file/2 compiles #{ext_name} to CSS (#{style})" do
+        test "Sass.compile_file/2 compiles #{ext_name} into CSS (#{style})" do
           result = unquote(compile_file(source_file_path, options))
 
           assert(result == unquote(expected_css))
