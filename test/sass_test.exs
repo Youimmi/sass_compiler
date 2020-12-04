@@ -62,7 +62,7 @@ defmodule SassTest do
       ["background-color: #eee;", "height: 100%;", "bar: baz;"],
       fn expected_string ->
         test "@import works as expected with load path (#{expected_string})" do
-          expected = ~r/#{unquote(expected_string)}/
+          expected = ~r/#{unquote(Regex.escape(expected_string))}/
 
           assert(Regex.match?(expected, @result))
         end
