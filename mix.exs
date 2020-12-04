@@ -62,7 +62,7 @@ defmodule SassCompiler.Mixfile do
     [
       update: [
         "cmd rm -rf _build deps mix.lock",
-        "cmd cd libsass && git pull https://github.com/sass/libsass",
+        "cmd cd libsass && make clean && git pull https://github.com/sass/libsass",
         "deps.get"
       ]
     ]
