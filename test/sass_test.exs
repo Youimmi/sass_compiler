@@ -21,18 +21,18 @@ defmodule SassTest do
     source_file_path = @fixtures_path <> "source.#{ext}"
     blank_file_path = @fixtures_path <> "blank.#{ext}"
 
-    describe "Compile the #{ext_name} file" do
-      perform_async([compact: 2, compressed: 3, expanded: 1, nested: 0], fn {style, code} ->
+    perform_async([compact: 2, compressed: 3, expanded: 1, nested: 0], fn {style, code} ->
+      describe "Compile the #{ext_name} file into CSS (#{style})" do
         {prefix, options} = style_options(ext, code)
         expected_css = fixture_css(@fixtures_path <> "#{prefix}.#{style}.css")
 
-        test "Sass.compile/2 compiles #{ext_name} to CSS #{ext_name} (#{style})" do
+        test "Sass.compile/2 compiles #{ext_name} to CSS (#{style})" do
           result = unquote(compile(File.read!(source_file_path), options))
 
           assert(result == unquote(expected_css))
         end
 
-        test "Sass.compile_file/2 compiles #{ext_name} to CSS #{ext_name} (#{style})" do
+        test "Sass.compile_file/2 compiles #{ext_name} to CSS (#{style})" do
           result = unquote(compile_file(source_file_path, options))
 
           assert(result == unquote(expected_css))
@@ -49,8 +49,8 @@ defmodule SassTest do
 
           assert(result == "")
         end
-      end)
-    end
+      end
+    end)
   end)
 
   describe "Compile imported files" do
