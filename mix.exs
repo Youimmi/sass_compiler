@@ -36,9 +36,9 @@ defmodule SassCompiler.Mixfile do
     [
       exclude_patterns: [".o", "libsass/lib", "libsass/.git"],
       files: ["c_src", "lib", "libsass", "LICENSE", "Makefile", "mix.exs", "README.md"],
-      maintainers: [],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/Youimmi/sass_compiler"}
+      links: %{"GitHub" => "https://github.com/Youimmi/sass_compiler"},
+      maintainers: ["Yuri S.", "Roman S."]
     ]
   end
 
