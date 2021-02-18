@@ -17,7 +17,7 @@ ERL_CFLAGS ?= -I$(ERL_EI_INCLUDE_DIR) -Ilibsass -Ilibsass/include
 ERL_LDFLAGS ?= -Ilibsass -Ilibsass/include -Llibsass/lib
 
 LDFLAGS += -fPIC -shared
-CFLAGS ?= -fPIC -O3 -Wall -Wextra
+CFLAGS += -fPIC -O3 -Wall -Wextra
 CC = $(CROSSCOMPILER)g++
 
 ifeq ($(CROSSCOMPILE),)
