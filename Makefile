@@ -43,7 +43,7 @@ else
 endif # $J
 
 all:
-	$(MAKE) -C $(SASS_DIR) -j$(NPROCS) -s
+	$(MAKE) -C $(SASS_DIR) -j$(NPROCS)
 	$(MAKE) $(LIB_NAME)
 
 clean: libsass-clean sass_compiler-clean
