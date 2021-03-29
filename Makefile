@@ -42,15 +42,14 @@ else
   NPROCS := $J
 endif # $J
 
-all: libsass-make $(LIB_NAME)
+all:
+	$(MAKE) -C $(SASS_DIR) -j$(NPROCS)
+	$(MAKE) $(LIB_NAME)
 
 clean: libsass-clean sass_compiler-clean
 
 libsass-clean:
 	$(MAKE) -C $(SASS_DIR) clean
-
-libsass-make:
-	$(MAKE) -C $(SASS_DIR) -j$(NPROCS) -s
 
 %.o: %.c
 	$(CC) -x c++ -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
